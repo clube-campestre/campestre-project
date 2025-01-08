@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <!--Sweetalert2-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.11.0/dist/sweetalert2.all.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.11.0/dist/sweetalert2.min.css">
+  <link rel="icon" href="../assets/Wallpaper_Desbravadores-removebg-preview.png">
+  <link rel="stylesheet" href="cadastro.css">
+  <title>DesbravaJa | Cadastro</title>
+</head>
+
+<body>
+  <section id="section_login">
+    <div id="div_voltar">
+      <a href="index.html"><img src="../assets/icone_casa.png" alt=""></a>
+    </div>
+    <div class="caixaLogin">
+      <div class="login">
+        <h2>Cadastro</h2>
+        <div class="input">
+          <input id="nome_input" type="text" placeholder="Nome">
+          <div id="nome_erro" class="mensagem_erro"></div>
+        </div>
+        <div class="input">
+          <input id="email_input" type="text" placeholder="Email">
+          <div id="email_erro" class="mensagem_erro"></div>
+        </div>
+        <div class="input">
+          <input id="senha_input" type="password" placeholder="Senha">
+          <div id="senha_erro" class="mensagem_erro"></div>
+        </div>
+        <div class="input">
+          <input id="confirmacao_senha_input" type="password" placeholder="Confirme sua Senha">
+          <div id="confirmacao_senha_erro" class="mensagem_erro"></div>
+        </div>
+        <div class="input">
+          <button type="submit" value="Entrar" onclick="cadastrar()">Cadastrar</button>
+        </div>
+        <div class="links">
+          <a href="./login.html">Já tem uma conta?</a>
+        </div>
+      </div>
+      <div id="div_imglogo">
+        <img src="../assets/uniforme.png" alt="">
+      </div>
+    </div>
+  </section>
+</body>
+<script>
+  function cadastrar() {
+    // Limpar todas as mensagens de erro
+    nome_erro.innerHTML = ""
+    email_erro.innerHTML = ""
+    senha_erro.innerHTML = ""
+    confirmacao_senha_erro.innerHTML = ""
+
+    // Recupere o valor da nova input pelo nome do id
+    var nomeVar = nome_input.value
+    var emailVar = email_input.value
+    var senhaVar = senha_input.value
+    var confirmacaoSenhaVar = confirmacao_senha_input.value
+
+    var tamanho_senha = senhaVar.length
+    var index_arroba = emailVar.indexOf('@')
+    var index_ponto = emailVar.indexOf('.')
+
+    // Verificar e exibir mensagens de erro
+    var erro = false
+    if (nomeVar === "") {
+      nome_erro.innerHTML = "Este campo não pode ficar vazio."
+      erro = true
+    }
+    if (emailVar === "") {
+      email_erro.innerHTML = "Este campo não pode ficar vazio."
+      erro = true
+    }
+    else if (index_arroba < 0 || index_ponto < 0) {
+      email_erro.innerHTML = "O email precisa ter '@' e ' . ' ."
+      erro = true
+    }
+    if (senhaVar === "") {
+      senha_erro.innerHTML = "Este campo não pode ficar vazio."
+      erro = true
+    }
+    else if (tamanho_senha < 6) {
+      senha_erro.innerHTML = "A senha precisa ter ao menos 6 caracteres."
+      erro = true
+    }
+    if (confirmacaoSenhaVar === "") {
+      confirmacao_senha_erro.innerHTML = "Este campo não pode ficar vazio."
+      erro = true
+    }
+    if (senhaVar !== confirmacaoSenhaVar) {
+      confirmacao_senha_erro.innerHTML = "As senhas não coincidem."
+      erro = true
+    }
+
+    // Se houver erro, não prosseguir
+    if (erro) {
+      return false
+    }
+
+    // Prosseguir com o método fetch ou qualquer outra lógica adicional
+    fetch("/usuarios/cadastrar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        nomeServer: nomeVar,
+        emailServer: emailVar,
+        senhaServer: senhaVar,
+      }),
+    })
+      .then(function (resposta) {
+        console.log("resposta: ", resposta);
+
+        if (resposta.ok) {
+          Swal.fire({
+            title: "Cadastro Realizado!",
+            text: "Redirecionando para a pagina de Login",
+            imageUrl: "./assets/Wallpaper_Desbravadores-removebg-preview.png",
+            imageWidth: 300,
+            imageHeight: 300,
+            imageAlt: "Custom image",
+            timer: 2500
+          });
+          setTimeout(() => {
+            window.location = "login.html";
+          }, 3000);
+        } else {
+          throw new Error("Houve um erro ao tentar realizar o cadastro!");
+        }
+      })
+      .catch(function (resposta) {
+        console.log(`#ERRO: ${resposta}`);
+        alert("Este usuário já existe!");
+      });
+
+    return false;
+  }
+</script>
+
+</html>
